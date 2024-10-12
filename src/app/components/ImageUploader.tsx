@@ -1,10 +1,15 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, Dispatch, SetStateAction } from 'react';
 import { useDropzone } from 'react-dropzone';
 
 const MAX_IMAGES = 3;
 const MAX_DIMENSION = 1080;
 
-const ImageUploader: React.FC = () => {
+
+interface ImageUploaderProps {
+    setUploadedImages: Dispatch<SetStateAction<string[]>>
+}
+
+const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages }) => {
     const [images, setImages] = useState<File[]>([]);
 
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
@@ -47,6 +52,7 @@ const ImageUploader: React.FC = () => {
                 });
 
                 console.log('업로드 성공:', key);
+                setUploadedImages(prev => [...prev, key])
             }
             alert('모든 이미지가 성공적으로 업로드되었습니다.');
             setImages([]);
