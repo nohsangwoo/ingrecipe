@@ -1,0 +1,13 @@
+# *
+User-agent: *
+Allow: /
+
+# *
+User-agent: *
+Disallow: /private/
+
+# Host
+Host: https://ingrecipe.ludgi.ai
+
+# Sitemaps
+Sitemap: https://ingrecipe.ludgi.ai/sitemap.xml
