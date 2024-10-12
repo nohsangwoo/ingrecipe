@@ -54,7 +54,7 @@ const useCheckIngredients = ({ uploadedImages, isUploadComplete }: CheckIngredie
         checking()
     }, [uploadedImages])
 
-    const parsedData = resData?.data ? JSON.parse(resData.data) : [];
+    const parsedData: string[] = resData?.data ? JSON.parse(resData.data) : [];
 
     return { parsedData, isLoading: loading };
 
