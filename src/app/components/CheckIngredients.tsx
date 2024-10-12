@@ -69,7 +69,7 @@ const CheckIngredients = ({ isLoading, parsedData }: CheckIngredientsProps) => {
 
     const getRecipe = async () => {
         try {
-            const response = await axios.post('/api/getRecipe', { ingredients });
+            const response = await axios.post('/api/getRecipe', { ingredients, lang: "korean" });
 
             console.log("response: ", response.data)
             // 응답 처리
