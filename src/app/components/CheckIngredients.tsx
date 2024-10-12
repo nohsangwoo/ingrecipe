@@ -2,22 +2,25 @@
 
 import axios from "axios"
 import { useEffect, useState } from "react";
-import { IdentifyingTheIngredientsBodyType } from "../../../pages/api/IdentifyingTheIngredients";
+import { IdentifyingTheIngredientsBodyType, IdentifyingTheIngredientsResponseData } from "../../../pages/api/IdentifyingTheIngredients";
 
 
 interface CheckIngredientsProps {
     uploadedImages: string[]
+    isUploadComplete: boolean
 }
 
 
-const CheckIngredients = ({ uploadedImages }: CheckIngredientsProps) => {
+const CheckIngredients = ({ uploadedImages, isUploadComplete }: CheckIngredientsProps) => {
     const [loading, setLoading] = useState(false);
-    const [resData, setResData] = useState("");
+    const [resData, setResData] = useState<IdentifyingTheIngredientsResponseData>();
 
 
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const checking = async () => {
+        console.log("uploadedImages check in useEffect: ", uploadedImages)
+        if (uploadedImages.length === 0 || !uploadedImages || !isUploadComplete) {
+            return
+        }
         setLoading(true);
         try {
 
@@ -46,6 +49,14 @@ const CheckIngredients = ({ uploadedImages }: CheckIngredientsProps) => {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+
+        checking()
+    }, [uploadedImages])
+
+    const parsedData = resData?.data ? JSON.parse(resData.data) : [];
+
     return (
         <div className="flex flex-col gap-3">
             <h1>
@@ -65,11 +76,14 @@ const CheckIngredients = ({ uploadedImages }: CheckIngredientsProps) => {
                     })
                 }
             </div>
-            <button
-                onClick={handleSubmit}
-            >
-                check
-            </button>
+            <div>
+                {
+                    Array.isArray(parsedData) && parsedData.map((item, index) => (
+                        <div key={index}>{item}</div>
+                    ))
+                }
+            </div>
+
         </div>
     )
 }

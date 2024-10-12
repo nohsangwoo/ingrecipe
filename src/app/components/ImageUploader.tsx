@@ -7,9 +7,10 @@ const MAX_DIMENSION = 1080;
 
 interface ImageUploaderProps {
     setUploadedImages: Dispatch<SetStateAction<string[]>>
+    setIsUploadComplete: Dispatch<SetStateAction<boolean>>
 }
 
-const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages }) => {
+const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages, setIsUploadComplete }) => {
     const [images, setImages] = useState<File[]>([]);
 
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
@@ -38,6 +39,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages }) => {
     });
 
     const uploadImages = async () => {
+        setUploadedImages([])
+        setIsUploadComplete(false);
         try {
             for (const image of images) {
                 const response = await fetch('/api/presignedUrl?fileType=image/webp');
@@ -59,6 +62,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages }) => {
         } catch (error) {
             console.error('업로드 실패:', error);
             alert('이미지 업로드 중 오류가 발생했습니다.');
+        } finally {
+            setIsUploadComplete(true);
         }
     };
 
