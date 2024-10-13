@@ -2,7 +2,7 @@ import React, { useState, useCallback, Dispatch, SetStateAction } from 'react';
 import { useDropzone } from 'react-dropzone';
 
 const MAX_IMAGES = 3;
-const MAX_DIMENSION = 1080;
+const MAX_DIMENSION = 1024;
 
 
 interface ImageUploaderProps {

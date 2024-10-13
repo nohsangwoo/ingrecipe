@@ -44,6 +44,7 @@ export default async function handler(
       type: 'image_url',
       image_url: {
         url: `https://${baseUrl}/${key}`,
+        detail: 'low',
       },
     })) as any
 
@@ -68,6 +69,7 @@ export default async function handler(
           ],
         },
       ],
+      max_tokens: 300,
     })
 
     const contentResult = response.choices[0].message.content
