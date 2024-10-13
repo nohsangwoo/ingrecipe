@@ -105,7 +105,9 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages, isUplo
         setIsUploadComplete(false);
         try {
             for (const image of images) {
-                const response = await fetch('/api/presignedUrl?fileType=image/webp');
+                const response = await fetch('/api/presignedUrl?fileType=image/webp', {
+                    mode: 'cors' // CORS 모드 명시
+                });
                 const { uploadUrl, key } = await response.json();
 
                 await fetch(uploadUrl, {
@@ -114,9 +116,9 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages, isUplo
                     headers: {
                         'Content-Type': 'image/webp',
                     },
+                    mode: 'cors' // CORS 모드 명시
                 });
 
-                console.log('업로드 성공:', key);
                 setUploadedImages(prev => [...prev, key])
             }
             alert(text.uploadSuccess[lang]);

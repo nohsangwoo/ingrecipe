@@ -7,6 +7,7 @@ import useCheckIngredients from '../../hooks/useCheckIngredients';
 import CheckIngredients from './components/CheckIngredients';
 import LanguageSelector from './components/LanguageSelector';
 import TitleBox from './components/TitleBox';
+import PleaseWatchAds from './components/PleaseWatchAds';
 const ImageUploader = dynamic(() => import('./components/ImageUploader'), { ssr: false })
 
 export default function Home() {
@@ -46,6 +47,7 @@ export default function Home() {
       >
         <CheckIngredients isLoading={isLoading} parsedData={parsedData} isAuto={isAuto} />
       </motion.div>
+      <PleaseWatchAds />
     </motion.div>
   )
 }

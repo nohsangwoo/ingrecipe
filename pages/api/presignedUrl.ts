@@ -14,6 +14,18 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
+  // CORS 헤더 추가
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'GET, POST, PUT, DELETE, OPTIONS',
+  )
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end()
+  }
+
   const ex = (req.query.fileType as string).split('/')[1] // 예를들면 "image/png" 에서 "png"만 추출
   const { fileType } = req.query
 
