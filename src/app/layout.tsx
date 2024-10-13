@@ -16,38 +16,54 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "사주팔자 | 무료 사주풀이 및 운세 분석",
-  description: "전문가의 정확한 사주팔자 풀이로 당신의 운명을 알아보세요. 무료 사주 상담, 궁합, 토정비결, 운세 등 다양한 서비스 제공.",
+  title: "AI Recipe Finder | Upload Ingredients, Get Recipes",
+  description: "Upload a photo of your ingredients and get instant recipe recommendations. Discover new dishes with what you have in your kitchen!",
   keywords: [
-    "사주팔자, 무료 사주풀이, 운세, 사주상담",
-    "사주팔자 무료보기, 사주 해석, 사주 분석",
-    "토정비결, 사주 궁합, 사주 운세, 사주 운명",
-    "오늘의 운세, 주간 운세, 월간 운세, 연간 운세",
-    "사주팔자 상담, 사주 전문가, 사주 운세 앱",
-    "생년월일 운세, 사주 명리학, 사주 운세 분석",
-    "사주 운세 2024, 사주 운세 2025, 사주 운세 2026, 자평명리학, 사주 운세 무료",
-    "사주 운세 정확도, 사주 운세 추천, 사주 운세 비교"
+    // 영어 키워드
+    "AI recipe finder, ingredient recognition, photo recipe search",
+    "what to cook, recipe ideas, leftover ingredients recipes",
+    "meal planner, cooking inspiration, easy recipes",
+    "food recognition app, smart kitchen assistant, culinary AI",
+    "quick dinner ideas, recipe generator, ingredient-based cooking",
+    // 한국어 키워드
+    "AI 레시피 찾기, 재료 인식, 사진으로 요리법 찾기",
+    "오늘 뭐 먹지, 레시피 아이디어, 남은 재료로 요리하기",
+    "식단 계획, 요리 영감, 간단한 요리법",
+    "음식 인식 앱, 스마트 주방 도우미, 요리 AI",
+    "빠른 저녁 메뉴, 레시피 생성기, 재료 기반 요리",
+    // 일본어 키워드
+    "AI レシピファインダー, 材料認識, 写真でレシピ検索",
+    "今日の献立, レシピアイデア, 余り物でクッキング",
+    "食事プランナー, 料理のインスピレーション, 簡単レシピ",
+    "食材認識アプリ, スマートキッチンアシスタント, 料理AI",
+    "クイック夕食アイデア, レシピジェネレーター, 材料ベースの料理",
+    // 러시아어 키워드
+    "ИИ поиск рецептов, распознавание ингредиентов, поиск рецептов по фото",
+    "что приготовить, идеи рецептов, рецепты из остатков",
+    "планировщик питания, кулинарное вдохновение, простые рецепты",
+    "приложение распознавания еды, умный кухонный помощник, кулинарный ИИ",
+    "быстрые идеи для ужина, генератор рецептов, готовка на основе ингредиентов"
   ].join(", "),
   openGraph: {
-    title: "사주팔자 - 당신의 운명을 밝혀주는 무료 사주풀이",
-    description: "전문가의 정확한 사주팔자 해석으로 당신의 과거, 현재, 미래를 알아보세요. 무료 사주상담 및 다양한 운세 서비스 제공.",
+    title: "AI Recipe Finder - Turn Your Ingredients into Delicious Meals",
+    description: "Upload a photo of your ingredients and let our AI suggest perfect recipes. Discover new dishes and reduce food waste!",
     images: [
       {
-        url: "https://ingrecipe.ludgi.ai/logo.png",
+        url: "https://ingrecipe.ludgi.ai/logo.webp",
         width: 1200,
         height: 630,
-        alt: "사주팔자 앱 인터페이스",
+        alt: "AI Recipe Finder App Interface",
       },
     ],
-    locale: "ko_KR",
+    locale: "en_US",
     type: "website",
-    siteName: "사주팔자",
+    siteName: "AI Recipe Finder",
   },
   twitter: {
     card: "summary_large_image",
-    title: "사주팔자 - 무료 사주풀이 및 운세 분석",
-    description: "당신의 운명을 알고 싶으신가요? 전문가의 정확한 사주팔자 풀이로 인생의 길을 밝혀보세요. 무료 상담 가능!",
-    images: ["https://ingrecipe.ludgi.ai/logo.png"],
+    title: "AI Recipe Finder - Photo to Recipe Magic",
+    description: "Snap a pic of your ingredients, get instant recipe ideas. Cook smarter, reduce waste, and enjoy delicious meals!",
+    images: ["https://ingrecipe.ludgi.ai/logo.webp"],
   },
   robots: {
     index: true,

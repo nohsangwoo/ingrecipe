@@ -216,10 +216,34 @@ const CheckIngredients: React.FC<CheckIngredientsProps> = ({ isLoading, parsedDa
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={() => fetchRecipe()}
-                className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 py-3 rounded-lg shadow-lg transition-all duration-300 hover:from-green-600 hover:to-blue-600 w-full text-lg font-semibold"
+                className={`bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 py-3 rounded-lg shadow-lg transition-all duration-300 hover:from-green-600 hover:to-blue-600 w-full text-lg font-semibold ${isPending ? 'relative overflow-hidden' : ''}`}
                 disabled={isPending}
             >
-                {isPending ? '레시피 생성 중...' : '요리 가능한 레시피 얻기'}
+                {isPending ? (
+                    <>
+                        <span className="opacity-0">레시피 생성 중...</span>
+                        <motion.div
+                            className="absolute inset-0 flex items-center justify-center"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                        >
+                            <motion.div
+                                className="w-6 h-6 border-t-2 border-white rounded-full"
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            />
+                            <motion.span
+                                className="ml-2"
+                                animate={{ opacity: [1, 0.5, 1] }}
+                                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                            >
+                                레시피 생성 중...
+                            </motion.span>
+                        </motion.div>
+                    </>
+                ) : (
+                    '요리 가능한 레시피 얻기'
+                )}
             </motion.button>
 
             <AnimatePresence>

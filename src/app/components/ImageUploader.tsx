@@ -76,11 +76,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages, isUplo
         }
     };
 
-    useEffect(() => {
-        if (isUploadComplete) {
-            console.log("업로드 완료됐음!: ", isUploadComplete)
-        }
-    }, [isUploadComplete])
+
 
     useEffect(() => {
         return () => {
@@ -98,8 +94,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages, isUplo
 
             <div
                 {...getRootProps()}
-                // whileHover={{ scale: 1.02 }}
-                // whileTap={{ scale: 0.98 }}
                 className="border-2 border-dashed border-gray-600 p-8 mb-4 rounded-lg cursor-pointer hover:border-blue-500 hover:scale-105 transition-all duration-150 active:scale-100"
             >
                 <input {...getInputProps()} />
