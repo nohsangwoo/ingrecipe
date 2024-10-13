@@ -11,8 +11,6 @@ export default function Home() {
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [isUploadComplete, setIsUploadComplete] = useState<boolean>(false);
   const [isAuto, setIsAuto] = useState(true)
-
-
   const { isLoading, parsedData } = useCheckIngredients({ uploadedImages, isUploadComplete })
 
 
@@ -21,7 +19,7 @@ export default function Home() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="grid grid-cols-1 gap-8 items-center justify-items-center min-h-screen p-4 md:p-8 bg-gray-900 text-gray-100"
+      className="grid grid-cols-1 gap-3 items-center justify-items-center min-h-screen p-4 md:p-8 bg-gray-900 text-gray-100"
     >
       <motion.div
         initial={{ y: -50, opacity: 0 }}
@@ -39,7 +37,7 @@ export default function Home() {
         // whileTap={{ scale: 0.95 }}
         className="w-full max-w-md"
       >
-        <ImageUploader setUploadedImages={setUploadedImages} setIsUploadComplete={setIsUploadComplete} isAuto={isAuto} setIsAuto={setIsAuto} />
+        <ImageUploader setUploadedImages={setUploadedImages} isUploadComplete={isUploadComplete} setIsUploadComplete={setIsUploadComplete} isAuto={isAuto} setIsAuto={setIsAuto} />
       </motion.div>
       <motion.div
         initial={{ x: 100, opacity: 0 }}

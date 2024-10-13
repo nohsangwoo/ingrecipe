@@ -1,4 +1,4 @@
-import React, { useState, useCallback, Dispatch, SetStateAction } from 'react';
+import React, { useState, useCallback, Dispatch, SetStateAction, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -8,13 +8,15 @@ const MAX_DIMENSION = 1024;
 
 interface ImageUploaderProps {
     setUploadedImages: Dispatch<SetStateAction<string[]>>
+    isUploadComplete: boolean
     setIsUploadComplete: Dispatch<SetStateAction<boolean>>
     isAuto: boolean
     setIsAuto: Dispatch<SetStateAction<boolean>>
 }
 
-const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages, setIsUploadComplete, isAuto, setIsAuto }) => {
+const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages, isUploadComplete, setIsUploadComplete, isAuto, setIsAuto }) => {
     const [images, setImages] = useState<File[]>([]);
+    const [previews, setPreviews] = useState<string[]>([]);
 
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
         if (images.length + acceptedFiles.length > MAX_IMAGES) {
@@ -31,6 +33,10 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages, setIsU
         );
 
         setImages((prevImages) => [...prevImages, ...processedImages]);
+
+        // 프리뷰 URL 생성
+        const newPreviews = processedImages.map(file => URL.createObjectURL(file));
+        setPreviews(prevPreviews => [...prevPreviews, ...newPreviews]);
     }, [images]);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -70,6 +76,18 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages, setIsU
         }
     };
 
+    useEffect(() => {
+        if (isUploadComplete) {
+            console.log("업로드 완료됐음!: ", isUploadComplete)
+        }
+    }, [isUploadComplete])
+
+    useEffect(() => {
+        return () => {
+            previews.forEach(URL.revokeObjectURL);
+        };
+    }, [previews]);
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -91,7 +109,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages, setIsU
                     transition={{ delay: 0.2 }}
                     className="text-center text-gray-300"
                 >
-                    {isDragActive ? '이미지를 여기에 놓으세요...' : '이미지를 드래그 앤 드롭하거나 클릭하여 선택하세요'}
+                    {isDragActive ? '이미지를 여기에 놓으세요...' : '이미지를 드래그 앤 드롭하거나 클릭하여 재료를 선택하세요'}
                 </motion.p>
             </div>
             <AnimatePresence>
@@ -102,7 +120,15 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages, setIsU
                         exit={{ opacity: 0, height: 0 }}
                         className="mt-4"
                     >
-                        <p className="text-gray-300 mb-2">{images.length}개의 이미지가 선택되었습니다.</p>
+                        <p className="text-gray-300 mb-2">{images.length}개의 이미지가 선택되었습니다:</p>
+                        <div className="grid grid-cols-3 gap-2 mb-4">
+                            {images.map((image, index) => (
+                                <div key={index} className="bg-gray-700 p-2 rounded">
+                                    <img src={previews[index]} alt={image.name} className="w-full h-24 object-cover rounded mb-1" />
+                                    <p className="text-xs text-gray-300 truncate">{image.name}</p>
+                                </div>
+                            ))}
+                        </div>
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
@@ -114,9 +140,9 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages, setIsU
                     </motion.div>
                 )}
             </AnimatePresence>
-            {images.length === 0 && isAuto && (
+            {(images.length === 0 && isAuto && !isUploadComplete) && (
                 <div
-                    className="bg-blue-600 text-white p-2 rounded-md w-full hover:bg-blue-700 mb-2 cursor-pointer flex justify-center items-center active:scale-95 transition-all duration-150 "
+                    className="bg-yellow-600 text-white p-2 rounded-md w-full hover:bg-blue-700 mb-2 cursor-pointer flex justify-center items-center active:scale-95 transition-all duration-150 "
                     onClick={() => setIsAuto(false)}
                 >
                     수동으로 재료 입력하기
