@@ -11,6 +11,13 @@ const CheckIngredients = ({ isLoading, parsedData }: CheckIngredientsProps) => {
     const [newIngredient, setNewIngredient] = useState<string>('');
     const [askSalt, setAskSalt] = useState<boolean>(false);
     const [askPepper, setAskPepper] = useState<boolean>(false);
+    const [recipeData, setRecipeData] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        setIngredients([...parsedData])
+
+    }, [parsedData])
 
     useEffect(() => {
         checkSaltAndPepper();
@@ -70,14 +77,20 @@ const CheckIngredients = ({ isLoading, parsedData }: CheckIngredientsProps) => {
     const getRecipe = async () => {
         try {
             const response = await axios.post('/api/getRecipe', { ingredients, lang: "korean" });
-
-            console.log("response: ", response.data)
-            // 응답 처리
+            console.log("response: ", response.data);
+            if (response.data.ok) {
+                setRecipeData(response.data.data);
+                setError(null);
+            } else {
+                setError(response.data.error || '알 수 없는 오류가 발생했습니다.');
+                setRecipeData(null);
+            }
         } catch (error) {
             console.error('레시피 가져오기 오류:', error);
+            setError('레시피를 가져오는 중 오류가 발생했습니다.');
+            setRecipeData(null);
         }
     };
-
 
     if (!parsedData || parsedData?.length === 0) {
         return (
@@ -143,6 +156,20 @@ const CheckIngredients = ({ isLoading, parsedData }: CheckIngredientsProps) => {
             <button onClick={getRecipe} className="bg-green-500 text-white px-4 py-2 rounded">
                 요리 가능한 레시피 얻기
             </button>
+
+            {error && (
+                <div className="mt-4 p-4 bg-red-100 text-red-700 rounded">
+                    <h3 className="font-bold">오류:</h3>
+                    <p>{error}</p>
+                </div>
+            )}
+
+            {recipeData && (
+                <div className="mt-4 p-4 bg-gray-100 rounded">
+                    <h3 className="font-bold text-xl mb-2">레시피 제안:</h3>
+                    <pre className="whitespace-pre-wrap">{recipeData}</pre>
+                </div>
+            )}
         </div>
     )
 }

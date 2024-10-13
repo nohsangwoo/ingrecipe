@@ -33,9 +33,9 @@ export default async function handler(
 
     const prompt = `Create 5 recipe suggestions using the following ingredients: ${ingredients.join(
       ', ',
-    )}. 
-    If a genre (${genre}) is specified, focus on recipes from that cuisine. 
-    For each recipe, provide a detailed, step-by-step guide including relative proportions and weights of ingredients. 
+    )}.
+    If a genre (${genre}) is specified, focus on recipes from that cuisine.
+    For each recipe, provide a detailed, step-by-step guide including relative proportions and weights of ingredients.
     Also, suggest a relevant search term for each recipe.
     Format the response as follows:
     1. Recipe Name
@@ -68,12 +68,12 @@ export default async function handler(
         ],
       })
 
-      console.log('result: ', completion.choices[0].message.content)
       const result = completion.choices[0].message.content
+      console.log('result: ', result)
       if (!result) {
         res.status(200).json({ ok: false, error: 'some error' })
       }
-      res.status(200).json({ ok: true, data: 'hello recipe' })
+      res.status(200).json({ ok: true, data: result })
     } catch (error) {
       console.error('Error:', error)
       res.status(200).json({ ok: false, error: error as string })
