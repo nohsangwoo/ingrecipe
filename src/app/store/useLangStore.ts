@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 export const LangEnum = {
   ENGLISH: 'ENGLISH',
@@ -13,9 +14,16 @@ interface useLangStoreState {
   setLang: (lang: LangEnumTYPE) => void
 }
 
-const useLangStore = create<useLangStoreState>(set => ({
-  lang: LangEnum.ENGLISH,
-  setLang: (lang: LangEnumTYPE) => set(state => ({ lang: lang })),
-}))
+const useLangStore = create(
+  persist<useLangStoreState>(
+    set => ({
+      lang: LangEnum.ENGLISH,
+      setLang: (lang: LangEnumTYPE) => set({ lang }),
+    }),
+    {
+      name: 'lang-storage', // 로컬 스토리지에 저장될 키 이름
+    },
+  ),
+)
 
 export default useLangStore
