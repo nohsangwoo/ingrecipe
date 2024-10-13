@@ -27,11 +27,9 @@ export default async function handler(
     // POST 요청 처리
     const body = req.body as GetRecipeBodyType
 
-    console.log('body: ', body)
-
     const { ingredients, genre, lang } = body as GetRecipeBodyType
 
-    const prompt = `Create 5 recipe suggestions using the following ingredients: ${ingredients.join(
+    const prompt = `Create 3 recipe suggestions using the following ingredients: ${ingredients.join(
       ', ',
     )}.
     ${
@@ -75,13 +73,11 @@ export default async function handler(
       })
 
       const result = completion.choices[0].message.content
-      console.log('result: ', result)
       if (!result) {
         res.status(200).json({ ok: false, error: 'some error' })
       }
       res.status(200).json({ ok: true, data: result })
     } catch (error) {
-      console.error('Error:', error)
       res.status(200).json({ ok: false, error: error as string })
     }
   } else {

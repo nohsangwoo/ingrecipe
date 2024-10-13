@@ -37,8 +37,6 @@ export default async function handler(
     const body = req.body as IdentifyingTheIngredientsBodyType
     const lang = body.lang
 
-    console.log('body: ', body)
-
     const mergeKeys = [body?.firstKey, body?.secondKey, body?.thirdKey].filter(
       key => key !== undefined && key !== null && key !== '',
     )
@@ -73,7 +71,6 @@ export default async function handler(
     })
 
     const contentResult = response.choices[0].message.content
-    console.log('contentResult: ', contentResult)
     res.status(200).json({
       ok: true,
       data: contentResult,

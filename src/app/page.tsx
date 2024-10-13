@@ -28,6 +28,7 @@ export default function Home() {
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
+        className=' z-30'
       >
         <LanguageSelector />
       </motion.div>

@@ -25,7 +25,7 @@ export default function TitleBox() {
             initial={{ y: -50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="text-center"
+            className="text-center mt-14"
         >
             <h1 className="text-4xl font-bold mb-4 text-blue-400">
                 {text.title[lang]}

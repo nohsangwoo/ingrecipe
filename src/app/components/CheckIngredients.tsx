@@ -123,6 +123,18 @@ const text = {
         [LangEnum.RUSSIAN]: "перец",
         [LangEnum.JAPANESE]: "こしょう",
     },
+    longProcessWarning: {
+        [LangEnum.ENGLISH]: "This process may take 30-40 seconds.",
+        [LangEnum.KOREAN]: "이 작업은 30-40초 정도 걸릴 수 있습니다.",
+        [LangEnum.RUSSIAN]: "Этот процесс может занять 30-40 секунд.",
+        [LangEnum.JAPANESE]: "この処理には30〜40秒かかる場合があります。",
+    },
+    elapsedTime: {
+        [LangEnum.ENGLISH]: "Elapsed time: {time} seconds",
+        [LangEnum.KOREAN]: "경과 시간: {time}초",
+        [LangEnum.RUSSIAN]: "Прошло времени: {time} секунд",
+        [LangEnum.JAPANESE]: "経過時間: {time}秒",
+    },
 };
 
 
@@ -133,8 +145,31 @@ const CheckIngredients: React.FC<CheckIngredientsProps> = ({ isLoading, parsedDa
     const [askPepper, setAskPepper] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const { lang } = useLangStore()
+    const [elapsedTime, setElapsedTime] = useState<number>(0);
 
+    const { mutate: fetchRecipe, data: recipeData, error: fetchError, isPending } = useMutation({
+        mutationFn: () => getRecipe({ ingredients, lang }),
+        onSuccess: (data) => {
+            setError(null);
+        },
+        onError: (error: Error) => {
+            setError(error.message);
+        },
+    });
 
+    useEffect(() => {
+        let timer: NodeJS.Timeout;
+        if (isPending) {
+            timer = setInterval(() => {
+                setElapsedTime((prevTime) => prevTime + 1);
+            }, 1000);
+        } else {
+            setElapsedTime(0);
+        }
+        return () => {
+            if (timer) clearInterval(timer);
+        };
+    }, [isPending]);
 
     useEffect(() => {
         setIngredients([...parsedData]);
@@ -187,16 +222,6 @@ const CheckIngredients: React.FC<CheckIngredientsProps> = ({ isLoading, parsedDa
         }
         return response.data.data;
     };
-
-    const { mutate: fetchRecipe, data: recipeData, error: fetchError, isPending } = useMutation({
-        mutationFn: () => getRecipe({ ingredients, lang }),
-        onSuccess: (data) => {
-            setError(null);
-        },
-        onError: (error: Error) => {
-            setError(error.message);
-        },
-    });
 
     if (isLoading) {
         return (
@@ -315,28 +340,44 @@ const CheckIngredients: React.FC<CheckIngredientsProps> = ({ isLoading, parsedDa
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={() => fetchRecipe()}
-                className={`bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 py-3 rounded-lg shadow-lg transition-all duration-300 hover:from-green-600 hover:to-blue-600 w-full text-lg font-semibold ${isPending ? 'relative overflow-hidden' : ''}`}
+                className={`bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 py-3 rounded-lg shadow-lg transition-all duration-300 hover:from-green-600 hover:to-blue-600 w-full text-lg font-semibold ${isPending ? 'relative overflow-hidden min-h-[120px]' : ''}`}
                 disabled={isPending}
             >
                 {isPending ? (
                     <>
                         <span className="opacity-0">{text.generatingRecipe[lang]}</span>
                         <motion.div
-                            className="absolute inset-0 flex items-center justify-center"
+                            className="absolute inset-0 flex items-center justify-center flex-col p-2"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                         >
                             <motion.div
-                                className="w-6 h-6 border-t-2 border-white rounded-full"
+                                className="w-6 h-6 border-t-2 border-white rounded-full mb-2"
                                 animate={{ rotate: 360 }}
                                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                             />
                             <motion.span
-                                className="ml-2"
+                                className="text-center"
                                 animate={{ opacity: [1, 0.5, 1] }}
                                 transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
                             >
                                 {text.generatingRecipe[lang]}
+                            </motion.span>
+                            <motion.span
+                                className="text-sm text-gray-300 mt-2 text-center"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.5 }}
+                            >
+                                {text.longProcessWarning[lang]}
+                            </motion.span>
+                            <motion.span
+                                className="text-sm text-gray-300 mt-2 text-center"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.5 }}
+                            >
+                                {text.elapsedTime[lang].replace('{time}', elapsedTime.toString())}
                             </motion.span>
                         </motion.div>
                     </>

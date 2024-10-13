@@ -28,8 +28,6 @@ export default async function handler(
 
   const uploadUrl = await s3.getSignedUrlPromise('putObject', s3Params)
 
-  console.log('uploadUrl: ', uploadUrl)
-
   res.status(200).json({
     uploadUrl,
     key,
