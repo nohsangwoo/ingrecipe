@@ -1,6 +1,7 @@
 import React, { useState, useCallback, Dispatch, SetStateAction, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { motion, AnimatePresence } from 'framer-motion';
+import useLangStore, { LangEnum } from '../store/useLangStore';
 
 const MAX_IMAGES = 3;
 const MAX_DIMENSION = 1024;
@@ -17,10 +18,62 @@ interface ImageUploaderProps {
 const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages, isUploadComplete, setIsUploadComplete, isAuto, setIsAuto }) => {
     const [images, setImages] = useState<File[]>([]);
     const [previews, setPreviews] = useState<string[]>([]);
+    const { lang } = useLangStore()
+
+    const text = {
+        uploadSuccess: {
+            [LangEnum.ENGLISH]: "",
+            [LangEnum.KOREAN]: "모든 이미지가 성공적으로 업로드되었습니다.",
+            [LangEnum.RUSSIAN]: "",
+            [LangEnum.JAPANESE]: "",
+        },
+        uploadFail: {
+            [LangEnum.ENGLISH]: "",
+            [LangEnum.KOREAN]: "이미지 업로드 중 오류가 발생했습니다.",
+            [LangEnum.RUSSIAN]: "",
+            [LangEnum.JAPANESE]: "",
+        },
+        pleaseDropHere: {
+            [LangEnum.ENGLISH]: "",
+            [LangEnum.KOREAN]: "이미지를 여기에 놓으세요...",
+            [LangEnum.RUSSIAN]: "",
+            [LangEnum.JAPANESE]: "",
+        },
+        pleaseDropAndDropHere: {
+            [LangEnum.ENGLISH]: "",
+            [LangEnum.KOREAN]: "이미지를 드래그 앤 드롭하거나 클릭하여 재료를 선택하세요.",
+            [LangEnum.RUSSIAN]: "",
+            [LangEnum.JAPANESE]: "",
+        },
+        maxImagesDescription: {
+            [LangEnum.ENGLISH]: "",
+            [LangEnum.KOREAN]: `최대 ${MAX_IMAGES}개의 이미지만 업로드할 수 있습니다.`,
+            [LangEnum.RUSSIAN]: "",
+            [LangEnum.JAPANESE]: "",
+        },
+        lengthCheck: {
+            [LangEnum.ENGLISH]: "",
+            [LangEnum.KOREAN]: "개의 이미지가 선택되었습니다:",
+            [LangEnum.RUSSIAN]: "",
+            [LangEnum.JAPANESE]: "",
+        },
+        graspWithPhotos: {
+            [LangEnum.ENGLISH]: "",
+            [LangEnum.KOREAN]: "사진으로 재료 파악하기",
+            [LangEnum.RUSSIAN]: "",
+            [LangEnum.JAPANESE]: "",
+        },
+        enterManually: {
+            [LangEnum.ENGLISH]: "",
+            [LangEnum.KOREAN]: "수동으로 재료 입력하기",
+            [LangEnum.RUSSIAN]: "",
+            [LangEnum.JAPANESE]: "",
+        }
+    }
 
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
         if (images.length + acceptedFiles.length > MAX_IMAGES) {
-            alert(`최대 ${MAX_IMAGES}개의 이미지만 업로드할 수 있습니다.`);
+            alert(text.maxImagesDescription[lang]);
             return;
         }
 
@@ -66,11 +119,11 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages, isUplo
                 console.log('업로드 성공:', key);
                 setUploadedImages(prev => [...prev, key])
             }
-            alert('모든 이미지가 성공적으로 업로드되었습니다.');
+            alert(text.uploadSuccess[lang]);
             setImages([]);
         } catch (error) {
             console.error('업로드 실패:', error);
-            alert('이미지 업로드 중 오류가 발생했습니다.');
+            alert(text.uploadFail[lang]);
         } finally {
             setIsUploadComplete(true);
         }
@@ -103,7 +156,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages, isUplo
                     transition={{ delay: 0.2 }}
                     className="text-center text-gray-300"
                 >
-                    {isDragActive ? '이미지를 여기에 놓으세요...' : '이미지를 드래그 앤 드롭하거나 클릭하여 재료를 선택하세요'}
+                    {isDragActive ? text.pleaseDropHere[lang] : text.pleaseDropAndDropHere[lang]}
                 </motion.p>
             </div>
             <AnimatePresence>
@@ -114,7 +167,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages, isUplo
                         exit={{ opacity: 0, height: 0 }}
                         className="mt-4"
                     >
-                        <p className="text-gray-300 mb-2">{images.length}개의 이미지가 선택되었습니다:</p>
+                        <p className="text-gray-300 mb-2">{`${images.length}${text.lengthCheck[lang]}`}</p>
                         <div className="grid grid-cols-3 gap-2 mb-4">
                             {images.map((image, index) => (
                                 <div key={index} className="bg-gray-700 p-2 rounded">
@@ -129,7 +182,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages, isUplo
                             onClick={uploadImages}
                             className="bg-blue-600 text-white p-2 rounded-md w-full transition-colors hover:bg-blue-700"
                         >
-                            사진으로 재료 파악하기
+                            {text.graspWithPhotos[lang]}
                         </motion.button>
                     </motion.div>
                 )}
@@ -139,7 +192,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages, isUplo
                     className="bg-yellow-600 text-white p-2 rounded-md w-full hover:bg-blue-700 mb-2 cursor-pointer flex justify-center items-center active:scale-95 transition-all duration-150 "
                     onClick={() => setIsAuto(false)}
                 >
-                    수동으로 재료 입력하기
+                    {text.enterManually[lang]}
                 </div>
             )}
         </motion.div>
