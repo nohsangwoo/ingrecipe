@@ -9,7 +9,7 @@ const LanguageSelector: React.FC = () => {
         <select
             value={lang}
             onChange={(e) => setLang(e.target.value as LangEnumTYPE)}
-            className="fixed top-4 right-4 bg-gray-800 text-white p-2 rounded "
+            className="fixed top-4 right-4 bg-gray-800 text-white p-2 rounded z-10"
         >
             <option value={LangEnum.ENGLISH}>English</option>
             <option value={LangEnum.KOREAN}>한국어</option>

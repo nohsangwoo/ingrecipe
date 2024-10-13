@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useMutation } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
+import useLangStore, { LangEnum, LangEnumTYPE } from '../store/useLangStore';
 
 interface CheckIngredientsProps {
     isLoading: boolean;
@@ -24,11 +25,106 @@ interface ConditionalButtonProps {
 
 interface ErrorMessageProps {
     error: string;
+    lang: LangEnumTYPE
 }
 
 interface RecipeDisplayProps {
     recipeData: string;
+    lang: LangEnumTYPE
 }
+const text = {
+    ingredientList: {
+        [LangEnum.ENGLISH]: "Ingredient List",
+        [LangEnum.KOREAN]: "재료 목록",
+        [LangEnum.RUSSIAN]: "Список ингредиентов",
+        [LangEnum.JAPANESE]: "材料リスト",
+    },
+    existingIngredients: {
+        [LangEnum.ENGLISH]: "Existing Ingredients",
+        [LangEnum.KOREAN]: "기존 재료",
+        [LangEnum.RUSSIAN]: "Существующие ингредиенты",
+        [LangEnum.JAPANESE]: "既存の材料",
+    },
+    addedIngredients: {
+        [LangEnum.ENGLISH]: "Added Ingredients",
+        [LangEnum.KOREAN]: "추가된 재료",
+        [LangEnum.RUSSIAN]: "Добавленные ингредиенты",
+        [LangEnum.JAPANESE]: "追加された材料",
+    },
+    enterAdditionalIngredient: {
+        [LangEnum.ENGLISH]: "Enter additional ingredient",
+        [LangEnum.KOREAN]: "추가 재료를 입력하세요",
+        [LangEnum.RUSSIAN]: "Введите дополнительный ингредиент",
+        [LangEnum.JAPANESE]: "追加の材料を入力してください",
+    },
+    add: {
+        [LangEnum.ENGLISH]: "Add",
+        [LangEnum.KOREAN]: "추가",
+        [LangEnum.RUSSIAN]: "Добавить",
+        [LangEnum.JAPANESE]: "追加",
+    },
+    addSalt: {
+        [LangEnum.ENGLISH]: "Add Salt",
+        [LangEnum.KOREAN]: "소금 추가",
+        [LangEnum.RUSSIAN]: "Добавить соль",
+        [LangEnum.JAPANESE]: "塩を追加",
+    },
+    addPepper: {
+        [LangEnum.ENGLISH]: "Add Pepper",
+        [LangEnum.KOREAN]: "후추 추가",
+        [LangEnum.RUSSIAN]: "Добавить перец",
+        [LangEnum.JAPANESE]: "こしょうを追加",
+    },
+    getRecipe: {
+        [LangEnum.ENGLISH]: "Get Possible Recipe",
+        [LangEnum.KOREAN]: "요리 가능한 레시피 얻기",
+        [LangEnum.RUSSIAN]: "Получить возможный рецепт",
+        [LangEnum.JAPANESE]: "可能なレシピを取得",
+    },
+    generatingRecipe: {
+        [LangEnum.ENGLISH]: "Generating recipe...",
+        [LangEnum.KOREAN]: "레시피 생성 중...",
+        [LangEnum.RUSSIAN]: "Создание рецепта...",
+        [LangEnum.JAPANESE]: "レシピを生成中...",
+    },
+    errorOccurred: {
+        [LangEnum.ENGLISH]: "An error occurred:",
+        [LangEnum.KOREAN]: "오류 발생:",
+        [LangEnum.RUSSIAN]: "Произошла ошибка:",
+        [LangEnum.JAPANESE]: "エラーが発生しました：",
+    },
+    suggestedRecipe: {
+        [LangEnum.ENGLISH]: "Suggested Recipe:",
+        [LangEnum.KOREAN]: "레시피 제안:",
+        [LangEnum.RUSSIAN]: "Предлагаемый рецепт:",
+        [LangEnum.JAPANESE]: "提案されたレシピ：",
+    },
+    waitingForIngredients: {
+        [LangEnum.ENGLISH]: "Waiting for ingredients",
+        [LangEnum.KOREAN]: "재료입력 대기중",
+        [LangEnum.RUSSIAN]: "Ожидание ингредиентов",
+        [LangEnum.JAPANESE]: "材料入力待ち",
+    },
+    unknownError: {
+        [LangEnum.ENGLISH]: "An unknown error occurred.",
+        [LangEnum.KOREAN]: "알 수 없는 오류가 발생했습니다.",
+        [LangEnum.RUSSIAN]: "Произошла неизвестная ошибка.",
+        [LangEnum.JAPANESE]: "不明なエラーが発生しました。",
+    },
+    salt: {
+        [LangEnum.ENGLISH]: "salt",
+        [LangEnum.KOREAN]: "소금",
+        [LangEnum.RUSSIAN]: "соль",
+        [LangEnum.JAPANESE]: "塩",
+    },
+    pepper: {
+        [LangEnum.ENGLISH]: "pepper",
+        [LangEnum.KOREAN]: "후추",
+        [LangEnum.RUSSIAN]: "перец",
+        [LangEnum.JAPANESE]: "こしょう",
+    },
+};
+
 
 const CheckIngredients: React.FC<CheckIngredientsProps> = ({ isLoading, parsedData, isAuto }) => {
     const [ingredients, setIngredients] = useState<string[]>(parsedData);
@@ -36,6 +132,9 @@ const CheckIngredients: React.FC<CheckIngredientsProps> = ({ isLoading, parsedDa
     const [askSalt, setAskSalt] = useState<boolean>(false);
     const [askPepper, setAskPepper] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const { lang } = useLangStore()
+
+
 
     useEffect(() => {
         setIngredients([...parsedData]);
@@ -72,25 +171,25 @@ const CheckIngredients: React.FC<CheckIngredientsProps> = ({ isLoading, parsedDa
     };
 
     const addSalt = () => {
-        setIngredients([...ingredients, '소금']);
+        setIngredients([...ingredients, text.salt[lang]]);
         setAskSalt(false);
     };
 
     const addPepper = () => {
-        setIngredients([...ingredients, '후추']);
+        setIngredients([...ingredients, text.pepper[lang]]);
         setAskPepper(false);
     };
 
-    const getRecipe = async ({ ingredients, lang }: { ingredients: string[], lang: string }) => {
+    const getRecipe = async ({ ingredients, lang }: { ingredients: string[], lang: LangEnumTYPE }) => {
         const response = await axios.post('/api/getRecipe', { ingredients, lang });
         if (!response.data.ok) {
-            throw new Error(response.data.error || '알 수 없는 오류가 발생했습니다.');
+            throw new Error(response.data.error || text.unknownError[lang]);
         }
         return response.data.data;
     };
 
     const { mutate: fetchRecipe, data: recipeData, error: fetchError, isPending } = useMutation({
-        mutationFn: () => getRecipe({ ingredients, lang: "korean" }),
+        mutationFn: () => getRecipe({ ingredients, lang }),
         onSuccess: (data) => {
             setError(null);
         },
@@ -156,7 +255,7 @@ const CheckIngredients: React.FC<CheckIngredientsProps> = ({ isLoading, parsedDa
                         ease: "easeInOut",
                     }}
                 >
-                    재료입력 대기중
+                    {text.waitingForIngredients[lang]}
                 </motion.p>
             </motion.div>
         );
@@ -175,12 +274,12 @@ const CheckIngredients: React.FC<CheckIngredientsProps> = ({ isLoading, parsedDa
                 animate={{ y: 0 }}
                 transition={{ type: "spring", stiffness: 300 }}
             >
-                재료 목록
+                {text.ingredientList[lang]}
             </motion.h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <IngredientSection title="기존 재료" ingredients={parsedData} bgColor="bg-blue-900" textColor="text-blue-200" />
-                <IngredientSection title="추가된 재료" ingredients={ingredients.slice(parsedData.length)} bgColor="bg-green-900" textColor="text-green-200" />
+                <IngredientSection title={text.existingIngredients[lang]} ingredients={parsedData} bgColor="bg-blue-900" textColor="text-blue-200" />
+                <IngredientSection title={text.addedIngredients[lang]} ingredients={ingredients.slice(parsedData.length)} bgColor="bg-green-900" textColor="text-green-200" />
             </div>
 
             <motion.div
@@ -194,7 +293,7 @@ const CheckIngredients: React.FC<CheckIngredientsProps> = ({ isLoading, parsedDa
                         type="text"
                         value={newIngredient}
                         onChange={handleInputChange}
-                        placeholder="추가 재료를 입력하세요"
+                        placeholder={text.enterAdditionalIngredient[lang]}
                         className="flex-grow border-2 border-gray-700 bg-gray-800 text-gray-100 rounded-l-lg px-4 py-2 focus:outline-none focus:border-blue-500 transition-colors duration-300"
                     />
                     <motion.button
@@ -202,14 +301,14 @@ const CheckIngredients: React.FC<CheckIngredientsProps> = ({ isLoading, parsedDa
                         whileTap={{ scale: 0.95 }}
                         className="bg-blue-600 text-white px-6 py-2 rounded-r-lg transition-colors duration-300 hover:bg-blue-700"
                     >
-                        추가
+                        {text.add[lang]}
                     </motion.button>
                 </form>
             </motion.div>
 
             <div className="flex justify-center space-x-4 mb-6">
-                <ConditionalButton condition={askSalt} onClick={addSalt} text="소금 추가" />
-                <ConditionalButton condition={askPepper} onClick={addPepper} text="후추 추가" />
+                <ConditionalButton condition={askSalt} onClick={addSalt} text={text.addSalt[lang]} />
+                <ConditionalButton condition={askPepper} onClick={addPepper} text={text.addPepper[lang]} />
             </div>
 
             <motion.button
@@ -221,7 +320,7 @@ const CheckIngredients: React.FC<CheckIngredientsProps> = ({ isLoading, parsedDa
             >
                 {isPending ? (
                     <>
-                        <span className="opacity-0">레시피 생성 중...</span>
+                        <span className="opacity-0">{text.generatingRecipe[lang]}</span>
                         <motion.div
                             className="absolute inset-0 flex items-center justify-center"
                             initial={{ opacity: 0 }}
@@ -237,21 +336,21 @@ const CheckIngredients: React.FC<CheckIngredientsProps> = ({ isLoading, parsedDa
                                 animate={{ opacity: [1, 0.5, 1] }}
                                 transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
                             >
-                                레시피 생성 중...
+                                {text.generatingRecipe[lang]}
                             </motion.span>
                         </motion.div>
                     </>
                 ) : (
-                    '요리 가능한 레시피 얻기'
+                    text.getRecipe[lang]
                 )}
             </motion.button>
 
             <AnimatePresence>
-                {fetchError && <ErrorMessage error={(fetchError as Error).message} />}
+                {fetchError && <ErrorMessage error={(fetchError as Error).message} lang={lang} />}
             </AnimatePresence>
 
             <AnimatePresence>
-                {recipeData && <RecipeDisplay recipeData={recipeData} />}
+                {recipeData && <RecipeDisplay recipeData={recipeData} lang={lang} />}
             </AnimatePresence>
         </motion.div>
     );
@@ -302,26 +401,26 @@ const ConditionalButton: React.FC<ConditionalButtonProps> = ({ condition, onClic
     </AnimatePresence>
 );
 
-const ErrorMessage: React.FC<ErrorMessageProps> = ({ error }) => (
+const ErrorMessage: React.FC<ErrorMessageProps> = ({ error, lang }) => (
     <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         className="mt-6 p-4 bg-red-900 text-red-100 rounded-lg"
     >
-        <h3 className="font-bold text-lg mb-2">오류 발생:</h3>
+        <h3 className="font-bold text-lg mb-2">{text.errorOccurred[lang]}</h3>
         <p>{error}</p>
     </motion.div>
 );
 
-const RecipeDisplay: React.FC<RecipeDisplayProps> = ({ recipeData }) => (
+const RecipeDisplay: React.FC<RecipeDisplayProps> = ({ recipeData, lang }) => (
     <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         className="mt-6 p-6 bg-gray-800 rounded-lg shadow-inner"
     >
-        <h3 className="font-bold text-2xl mb-4 text-green-400">레시피 제안:</h3>
+        <h3 className="font-bold text-2xl mb-4 text-green-400">{text.suggestedRecipe[lang]}</h3>
         <pre className="whitespace-pre-wrap text-gray-300 text-lg">{recipeData}</pre>
     </motion.div>
 );

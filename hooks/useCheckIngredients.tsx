@@ -3,6 +3,7 @@
 import axios from "axios"
 import { useEffect, useState } from "react";
 import { IdentifyingTheIngredientsBodyType, IdentifyingTheIngredientsResponseData } from "../pages/api/IdentifyingTheIngredients";
+import useLangStore from "@/app/store/useLangStore";
 
 
 interface CheckIngredientsProps {
@@ -15,6 +16,7 @@ const useCheckIngredients = ({ uploadedImages, isUploadComplete }: CheckIngredie
     const [loading, setLoading] = useState(false);
     const [resData, setResData] = useState<IdentifyingTheIngredientsResponseData>();
 
+    const { lang } = useLangStore()
 
     const checking = async () => {
         if (uploadedImages.length === 0 || !uploadedImages || !isUploadComplete) {
@@ -26,7 +28,8 @@ const useCheckIngredients = ({ uploadedImages, isUploadComplete }: CheckIngredie
             const makeArgs = {
                 firstKey: uploadedImages?.[0],
                 secondKey: uploadedImages?.[1],
-                thirdKey: uploadedImages?.[2]
+                thirdKey: uploadedImages?.[2],
+                lang: lang
             }
 
             const response = await axios.post(`/api/IdentifyingTheIngredients`, {

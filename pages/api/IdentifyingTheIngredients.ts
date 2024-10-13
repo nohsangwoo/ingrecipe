@@ -1,3 +1,4 @@
+import { LangEnumTYPE } from '@/app/store/useLangStore'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import OpenAI from 'openai'
 
@@ -5,6 +6,7 @@ export type IdentifyingTheIngredientsBodyType = {
   firstKey: string
   secondKey: string
   thirdKey: string
+  lang: LangEnumTYPE
 }
 
 export type IdentifyingTheIngredientsResponseData = {
@@ -33,6 +35,7 @@ export default async function handler(
 
     // POST 요청 처리
     const body = req.body as IdentifyingTheIngredientsBodyType
+    const lang = body.lang
 
     console.log('body: ', body)
 
@@ -48,22 +51,19 @@ export default async function handler(
       },
     })) as any
 
-    console.log('imageTypeMessages: ', imageTypeMessages)
-
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
-          content:
-            'You are an AI trained to identify ingredients in images. Analyze the provided image(s) and list the ingredients you see. Respond only with an array of ingredient names in English.',
+          content: `You are an AI trained to identify ingredients in images. Analyze the provided image(s) and list the ingredients you see. Respond only with an array of ingredient names in ${lang}. If ${lang} is not a valid language, default to English.`,
         },
         {
           role: 'user',
           content: [
             {
               type: 'text',
-              text: 'Identify the ingredients in the following image(s). Provide your answer as a single-line array of ingredient names, without any line breaks or extra spaces. For example: ["pork","soy sauce","garlic"]',
+              text: `Identify the ingredients in the following image(s). Provide your answer as a single-line array of ingredient names in ${lang}, without any line breaks or extra spaces. For example: ["pork","soy sauce","garlic"]`,
             },
             ...imageTypeMessages,
           ],
