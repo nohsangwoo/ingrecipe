@@ -1,5 +1,6 @@
 import React, { useState, useCallback, Dispatch, SetStateAction } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const MAX_IMAGES = 3;
 const MAX_DIMENSION = 1024;
@@ -8,9 +9,11 @@ const MAX_DIMENSION = 1024;
 interface ImageUploaderProps {
     setUploadedImages: Dispatch<SetStateAction<string[]>>
     setIsUploadComplete: Dispatch<SetStateAction<boolean>>
+    isAuto: boolean
+    setIsAuto: Dispatch<SetStateAction<boolean>>
 }
 
-const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages, setIsUploadComplete }) => {
+const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages, setIsUploadComplete, isAuto, setIsAuto }) => {
     const [images, setImages] = useState<File[]>([]);
 
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
@@ -68,24 +71,58 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadedImages, setIsU
     };
 
     return (
-        <div>
-            <div {...getRootProps()} className="border-2 border-dashed p-4 mb-4">
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-gray-800 p-6 rounded-lg shadow-lg"
+        >
+
+            <div
+                {...getRootProps()}
+                // whileHover={{ scale: 1.02 }}
+                // whileTap={{ scale: 0.98 }}
+                className="border-2 border-dashed border-gray-600 p-8 mb-4 rounded-lg cursor-pointer hover:border-blue-500 hover:scale-105 transition-all duration-150 active:scale-100"
+            >
                 <input {...getInputProps()} />
-                {isDragActive ? (
-                    <p>이미지를 여기에 놓으세요...</p>
-                ) : (
-                    <p>이미지를 드래그 앤 드롭하거나 클릭하여 선택하세요</p>
-                )}
+                <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="text-center text-gray-300"
+                >
+                    {isDragActive ? '이미지를 여기에 놓으세요...' : '이미지를 드래그 앤 드롭하거나 클릭하여 선택하세요'}
+                </motion.p>
             </div>
-            {images.length > 0 && (
-                <div>
-                    <p>{images.length}개의 이미지가 선택되었습니다.</p>
-                    <button onClick={uploadImages} className="bg-blue-500 text-white p-2 rounded">
-                        업로드
-                    </button>
+            <AnimatePresence>
+                {images.length > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="mt-4"
+                    >
+                        <p className="text-gray-300 mb-2">{images.length}개의 이미지가 선택되었습니다.</p>
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={uploadImages}
+                            className="bg-blue-600 text-white p-2 rounded-md w-full transition-colors hover:bg-blue-700"
+                        >
+                            사진으로 재료 파악하기
+                        </motion.button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+            {images.length === 0 && isAuto && (
+                <div
+                    className="bg-blue-600 text-white p-2 rounded-md w-full hover:bg-blue-700 mb-2 cursor-pointer flex justify-center items-center active:scale-95 transition-all duration-150 "
+                    onClick={() => setIsAuto(false)}
+                >
+                    수동으로 재료 입력하기
                 </div>
             )}
-        </div>
+        </motion.div>
     );
 };
 

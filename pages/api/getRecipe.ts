@@ -34,9 +34,14 @@ export default async function handler(
     const prompt = `Create 5 recipe suggestions using the following ingredients: ${ingredients.join(
       ', ',
     )}.
-    If a genre (${genre}) is specified, focus on recipes from that cuisine.
+    ${
+      !!genre
+        ? `If a genre (${genre}) is specified, focus on recipes from that cuisine.`
+        : ''
+    }
     For each recipe, provide a detailed, step-by-step guide including relative proportions and weights of ingredients.
     Also, suggest a relevant search term for each recipe.
+    Additionally, suggest optional ingredients that could enhance the flavor if available.
     Format the response as follows:
     1. Recipe Name
     - Main Ingredient: [Name]
@@ -50,8 +55,9 @@ export default async function handler(
       ...
     - Cuisine: [Cuisine type]
     - Search Term: [A relevant search term for this recipe]
+    - Optional Flavor Enhancers: If available, adding these ingredients could enhance the flavor: [List of 2-3 optional ingredients]
 
-    Repeat this format for all 5 recipes. Please respond in ${
+    Repeat this format for all 3 recipes. Please respond in ${
       lang || 'English'
     }.`
 

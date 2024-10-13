@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useMutation } from '@tanstack/react-query';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface CheckIngredientsProps {
     isLoading: boolean
     parsedData: string[]
+    isAuto: boolean
 }
 
-const CheckIngredients = ({ isLoading, parsedData }: CheckIngredientsProps) => {
+const CheckIngredients = ({ isLoading, parsedData, isAuto }: CheckIngredientsProps) => {
     const [ingredients, setIngredients] = useState<string[]>(parsedData);
     const [newIngredient, setNewIngredient] = useState<string>('');
     const [askSalt, setAskSalt] = useState<boolean>(false);
@@ -23,24 +25,17 @@ const CheckIngredients = ({ isLoading, parsedData }: CheckIngredientsProps) => {
         checkSaltAndPepper();
     }, [ingredients]);
 
-    if (isLoading) {
-        <div>
-            로딩중
-        </div>
-    }
-
-
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setNewIngredient(e.target.value);
     };
 
-    const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === ',') {
-            e.preventDefault();
-            addIngredient();
-        }
-    };
+    // const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    //     if (e.key === ',') {
+    //         e.preventDefault();
+    //         addIngredient();
+    //     }
+    // };
 
     const addIngredient = () => {
         if (newIngredient.trim()) {
@@ -92,89 +87,188 @@ const CheckIngredients = ({ isLoading, parsedData }: CheckIngredientsProps) => {
         },
     });
 
-    if (!parsedData || parsedData?.length === 0) {
-        return (
-            <div>
-                데이터 없음
-            </div>
-        )
 
+
+    if (isLoading) {
+        return (
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex justify-center items-center h-64"
+            >
+                <motion.div
+                    animate={{
+                        rotate: 360,
+                        scale: [1, 1.2, 1],
+                    }}
+                    transition={{
+                        duration: 1,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                    }}
+                    className="w-16 h-16 border-t-4 border-blue-500 rounded-full animate-spin"
+                />
+            </motion.div>
+        );
+    }
+
+    if (isAuto && (!parsedData || parsedData?.length === 0)) {
+        return (
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center text-gray-400"
+            >
+                데이터 없음
+            </motion.div>
+        );
     }
 
     return (
-        <div className="p-4">
-            <h2 className="text-xl font-bold mb-4">기존 재료</h2>
-            <div className="flex flex-wrap gap-2 mb-4">
-                {parsedData.map((ingredient, index) => (
-                    <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded border border-blue-300">
-                        {ingredient}
-                    </span>
-                ))}
-            </div>
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-gray-800 p-6 rounded-lg shadow-lg"
+        >
+            <h2 className="text-2xl font-bold mb-4 text-blue-400">기존 재료</h2>
+            <motion.div className="flex flex-wrap gap-2 mb-4">
+                <AnimatePresence>
+                    {parsedData.map((ingredient, index) => (
+                        <motion.span
+                            key={index}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            whileHover={{ scale: 1.1 }}
+                            className="px-3 py-1 bg-blue-900 text-blue-200 rounded-full text-sm"
+                        >
+                            {ingredient}
+                        </motion.span>
+                    ))}
+                </AnimatePresence>
+            </motion.div>
 
-            <h2 className="text-xl font-bold mb-4">추가된 재료</h2>
-            <div className="flex flex-wrap gap-2 mb-4">
-                {ingredients.slice(parsedData.length).map((ingredient, index) => (
-                    <span key={index} className="px-2 py-1 bg-green-100 text-green-800 rounded border border-green-300">
-                        {ingredient}
-                    </span>
-                ))}
-            </div>
+            <h2 className="text-2xl font-bold mb-4 text-green-400">추가된 재료</h2>
+            <motion.div className="flex flex-wrap gap-2 mb-4">
+                <AnimatePresence>
+                    {ingredients.slice(parsedData.length).map((ingredient, index) => (
+                        <motion.span
+                            key={index}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            whileHover={{ scale: 1.1 }}
+                            className="px-3 py-1 bg-green-900 text-green-200 rounded-full text-sm"
+                        >
+                            {ingredient}
+                        </motion.span>
+                    ))}
+                </AnimatePresence>
+            </motion.div>
 
-            <div className="mb-4">
-                <input
-                    type="text"
-                    value={newIngredient}
-                    onChange={handleInputChange}
-                    onKeyDown={handleInputKeyDown}
-                    placeholder="추가 재료를 입력하세요 (콤마로 구분)"
-                    className="border border-gray-300 rounded px-2 py-1 mr-2"
-                />
-                <button onClick={addIngredient} className="bg-blue-500 text-white px-4 py-1 rounded">
-                    추가
-                </button>
-            </div>
+            <motion.div className="mb-4 flex">
+                <form onSubmit={(e) => {
+                    e.preventDefault()
+                    addIngredient()
+                }}>
+                    <input
+                        type="text"
+                        value={newIngredient}
+                        onChange={handleInputChange}
+                        // onKeyDown={handleInputKeyDown}
+                        placeholder="추가 재료를 입력하세요"
+                        className="flex-grow border border-gray-700 bg-gray-900 text-gray-100 rounded-l px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        // onClick={addIngredient}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-r transition-colors hover:bg-blue-700"
+                    >
+                        추가
+                    </motion.button>
+                </form>
+            </motion.div>
 
-            {askSalt && (
-                <div className="mb-2">
-                    <p>소금이 필요한가요?</p>
-                    <button onClick={addSalt} className="bg-yellow-500 text-white px-4 py-1 rounded">
-                        소금 추가
-                    </button>
-                </div>
-            )}
+            <AnimatePresence>
+                {askSalt && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="mb-2"
+                    >
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={addSalt}
+                            className="bg-yellow-600 text-white px-4 py-1 rounded transition-colors hover:bg-yellow-700"
+                        >
+                            소금 추가
+                        </motion.button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-            {askPepper && (
-                <div className="mb-2">
-                    <p>후추가 필요한가요?</p>
-                    <button onClick={addPepper} className="bg-yellow-500 text-white px-4 py-1 rounded">
-                        후추 추가
-                    </button>
-                </div>
-            )}
+            <AnimatePresence>
+                {askPepper && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="mb-2"
+                    >
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={addPepper}
+                            className="bg-yellow-600 text-white px-4 py-1 rounded transition-colors hover:bg-yellow-700"
+                        >
+                            후추 추가
+                        </motion.button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-            <button
+            <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => fetchRecipe()}
-                className="bg-green-500 text-white px-4 py-2 rounded"
+                className="bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg transition-colors hover:bg-green-700 w-full mt-4"
                 disabled={isPending}
             >
                 {isPending ? '로딩 중...' : '요리 가능한 레시피 얻기'}
-            </button>
+            </motion.button>
 
-            {fetchError && (
-                <div className="mt-4 p-4 bg-red-100 text-red-700 rounded">
-                    <h3 className="font-bold">오류:</h3>
-                    <p>{(fetchError as Error).message}</p>
-                </div>
-            )}
+            <AnimatePresence>
+                {fetchError && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="mt-4 p-4 bg-red-900 text-red-100 rounded-lg"
+                    >
+                        <h3 className="font-bold">오류:</h3>
+                        <p>{(fetchError as Error).message}</p>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-            {recipeData && (
-                <div className="mt-4 p-4 bg-gray-100 rounded">
-                    <h3 className="font-bold text-xl mb-2">레시피 제안:</h3>
-                    <pre className="whitespace-pre-wrap">{recipeData}</pre>
-                </div>
-            )}
-        </div>
+            <AnimatePresence>
+                {recipeData && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="mt-4 p-4 bg-gray-700 rounded-lg"
+                    >
+                        <h3 className="font-bold text-xl mb-2 text-green-400">레시피 제안:</h3>
+                        <pre className="whitespace-pre-wrap text-gray-300">{recipeData}</pre>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
     )
 }
 
