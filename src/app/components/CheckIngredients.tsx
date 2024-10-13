@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useMutation } from '@tanstack/react-query';
 
 interface CheckIngredientsProps {
     isLoading: boolean
@@ -11,7 +12,6 @@ const CheckIngredients = ({ isLoading, parsedData }: CheckIngredientsProps) => {
     const [newIngredient, setNewIngredient] = useState<string>('');
     const [askSalt, setAskSalt] = useState<boolean>(false);
     const [askPepper, setAskPepper] = useState<boolean>(false);
-    const [recipeData, setRecipeData] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -74,23 +74,23 @@ const CheckIngredients = ({ isLoading, parsedData }: CheckIngredientsProps) => {
         setAskPepper(false);
     };
 
-    const getRecipe = async () => {
-        try {
-            const response = await axios.post('/api/getRecipe', { ingredients, lang: "korean" });
-            console.log("response: ", response.data);
-            if (response.data.ok) {
-                setRecipeData(response.data.data);
-                setError(null);
-            } else {
-                setError(response.data.error || '알 수 없는 오류가 발생했습니다.');
-                setRecipeData(null);
-            }
-        } catch (error) {
-            console.error('레시피 가져오기 오류:', error);
-            setError('레시피를 가져오는 중 오류가 발생했습니다.');
-            setRecipeData(null);
+    const getRecipe = async ({ ingredients, lang }: { ingredients: string[], lang: string }) => {
+        const response = await axios.post('/api/getRecipe', { ingredients, lang });
+        if (!response.data.ok) {
+            throw new Error(response.data.error || '알 수 없는 오류가 발생했습니다.');
         }
+        return response.data.data;
     };
+
+    const { mutate: fetchRecipe, data: recipeData, error: fetchError, isPending } = useMutation({
+        mutationFn: () => getRecipe({ ingredients, lang: "korean" }),
+        onSuccess: (data) => {
+            setError(null);
+        },
+        onError: (error: Error) => {
+            setError(error.message);
+        },
+    });
 
     if (!parsedData || parsedData?.length === 0) {
         return (
@@ -153,14 +153,18 @@ const CheckIngredients = ({ isLoading, parsedData }: CheckIngredientsProps) => {
                 </div>
             )}
 
-            <button onClick={getRecipe} className="bg-green-500 text-white px-4 py-2 rounded">
-                요리 가능한 레시피 얻기
+            <button
+                onClick={() => fetchRecipe()}
+                className="bg-green-500 text-white px-4 py-2 rounded"
+                disabled={isPending}
+            >
+                {isPending ? '로딩 중...' : '요리 가능한 레시피 얻기'}
             </button>
 
-            {error && (
+            {fetchError && (
                 <div className="mt-4 p-4 bg-red-100 text-red-700 rounded">
                     <h3 className="font-bold">오류:</h3>
-                    <p>{error}</p>
+                    <p>{(fetchError as Error).message}</p>
                 </div>
             )}
 
